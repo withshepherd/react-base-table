@@ -1,22 +1,21 @@
+import faker from '@withshepherd/faker'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import styled, { css, keyframes, createGlobalStyle } from 'styled-components'
-import * as ReactSortableHoc from 'react-sortable-hoc'
-import * as ReactOverlays from 'react-overlays'
-import ReactTexty from 'react-texty'
-import faker from 'faker';
-
 import BaseTable, {
-  Column,
-  SortOrder,
   AutoResizer,
-  normalizeColumns,
   callOrReturn,
-  unflatten,
+  Column,
+  normalizeColumns,
+  SortOrder,
   TableHeader as BaseTableHeader,
   TableRow as BaseTableRow,
+  unflatten,
 } from 'react-base-table'
 import BaseTableExpandIcon from 'react-base-table/ExpandIcon'
+import ReactDOM from 'react-dom'
+import * as ReactOverlays from 'react-overlays'
+import * as ReactSortableHoc from 'react-sortable-hoc'
+import ReactTexty from 'react-texty'
+import styled, { createGlobalStyle, css, keyframes } from 'styled-components'
 
 const generateColumns = (count = 10, prefix = 'column-', props) =>
   new Array(count).fill(0).map((column, columnIndex) => ({
@@ -42,8 +41,8 @@ const generateData = (columns, count = 200, prefix = 'row-') =>
   })
 
 const noop = () => {}
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
-const action = message => args => console.log(message, args)
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const action = (message) => (args) => console.log(message, args)
 
 const Table = React.forwardRef((props, ref) => (
   <BaseTable ref={ref} width={700} height={400} {...props} />
