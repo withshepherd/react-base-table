@@ -3,6 +3,7 @@ $table-prefix: BaseTable !default;
 @mixin table-edge-padding($padding-left: null, $padding-right: null) {
   .#{$table-prefix} {
     &__header-cell,
+    &__footer-cell,
     &__row-cell {
       @if $padding-left != null {
         &:first-child {
@@ -101,6 +102,9 @@ $table-prefix: BaseTable !default;
       .#{$table-prefix}__header {
         background-color: $header-background-color;
       }
+      .#{$table-prefix}__footer {
+        background-color: $header-background-color;
+      }
     }
 
     &-frozen-left,
@@ -158,6 +162,7 @@ $table-prefix: BaseTable !default;
   }
 
   &__header-row,
+  &__footer-row,
   &__row {
     display: flex;
     align-items: center;
@@ -165,7 +170,8 @@ $table-prefix: BaseTable !default;
     box-sizing: border-box;
   }
 
-  &__header-row {
+  &__header-row,
+  &__footer-row {
     background-color: $header-background-color;
     font-weight: $header-font-weight;
   }
@@ -184,6 +190,7 @@ $table-prefix: BaseTable !default;
   }
 
   &__header-cell,
+  &__footer-cell,
   &__row-cell {
     min-width: 0;
     height: 100%;

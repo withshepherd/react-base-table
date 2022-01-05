@@ -1,34 +1,33 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import cn from 'classnames';
 import memoize from 'memoize-one';
-
+import PropTypes from 'prop-types';
+import React from 'react';
+import Column, { Alignment, FrozenDirection } from './Column';
+import ColumnManager from './ColumnManager';
+import ColumnResizer from './ColumnResizer';
+import ExpandIcon from './ExpandIcon';
 import GridTable from './GridTable';
+import SortIndicator from './SortIndicator';
+import SortOrder from './SortOrder';
+import TableCell from './TableCell';
+import TableFooterRow from './TableFooterRow';
+import TableHeaderCell from './TableHeaderCell';
 import TableHeaderRow from './TableHeaderRow';
 import TableRow from './TableRow';
-import TableHeaderCell from './TableHeaderCell';
-import TableCell from './TableCell';
-import Column, { Alignment, FrozenDirection } from './Column';
-import SortOrder from './SortOrder';
-import ExpandIcon from './ExpandIcon';
-import SortIndicator from './SortIndicator';
-import ColumnResizer from './ColumnResizer';
-import ColumnManager from './ColumnManager';
-
 import {
-  renderElement,
-  normalizeColumns,
-  getScrollbarSize as defaultGetScrollbarSize,
-  getEstimatedTotalRowsHeight,
-  isObjectEqual,
   callOrReturn,
-  hasChildren,
-  flattenOnKeys,
   cloneArray,
-  getValue,
-  throttle,
   debounce,
+  flattenOnKeys,
+  getEstimatedTotalRowsHeight,
+  getScrollbarSize as defaultGetScrollbarSize,
+  getValue,
+  hasChildren,
+  isObjectEqual,
   noop,
+  normalizeColumns,
+  renderElement,
+  throttle,
 } from './utils';
 
 const getColumns = memoize((columns, children) => columns || normalizeColumns(children));
@@ -79,6 +78,8 @@ class BaseTable extends React.PureComponent {
     this.renderRowCell = this.renderRowCell.bind(this);
     this.renderHeader = this.renderHeader.bind(this);
     this.renderHeaderCell = this.renderHeaderCell.bind(this);
+    this.renderFooter = this.renderFooter.bind(this);
+    this.renderFooterCell = this.renderFooterCell.bind(this);
 
     this._handleScroll = this._handleScroll.bind(this);
     this._handleVerticalScroll = this._handleVerticalScroll.bind(this);
@@ -521,6 +522,76 @@ class BaseTable extends React.PureComponent {
     );
   }
 
+  renderFooter({ columns, footerIndex, style }) {
+    const { footerClassName, footerRenderer } = this.props;
+
+    const footerClass = callOrReturn(footerClassName, { columns, footerIndex });
+    const extraProps = callOrReturn(this.props.footerProps, { columns, footerIndex });
+
+    const className = cn(this._prefixClass('footer-row'), footerClass, {
+      [this._prefixClass('footer-row--resizing')]: !!this.state.resizingKey,
+      [this._prefixClass('footer-row--customized')]: footerRenderer,
+    });
+
+    const footerProps = {
+      ...extraProps,
+      role: 'row',
+      key: `footer-${footerIndex}`,
+      className,
+      style,
+      columns,
+      footerIndex,
+      footerRenderer,
+      cellRenderer: this.renderFooterCell,
+      expandColumnKey: this.props.expandColumnKey,
+      expandIcon: this._getComponent('ExpandIcon'),
+    };
+
+    return <TableFooterRow {...footerProps} />;
+  }
+
+  renderFooterCell({ columns, column, columnIndex, footerIndex, expandIcon }) {
+    if (column[ColumnManager.PlaceholderKey]) {
+      return (
+        <div
+          key={`footer-${footerIndex}-cell-${column.key}-placeholder`}
+          className={this._prefixClass('footer-cell-placeholder')}
+          style={this.columnManager.getColumnStyle(column.key)}
+        />
+      );
+    }
+
+    const { footerClassName, footerRenderer } = column;
+    const { footerCellProps } = this.props;
+
+    const cellProps = { columns, column, columnIndex, footerIndex, container: this };
+    const cell = renderElement(footerRenderer || null, cellProps);
+
+    const cellCls = callOrReturn(footerClassName, { columns, column, columnIndex, footerIndex });
+    const cls = cn(this._prefixClass('footer-cell'), cellCls, {
+      [this._prefixClass('footer-cell--align-center')]: column.align === Alignment.CENTER,
+      [this._prefixClass('footer-cell--align-right')]: column.align === Alignment.RIGHT,
+      [this._prefixClass('footer-cell--sortable')]: column.sortable,
+      [this._prefixClass('footer-cell--resizing')]: column.key === this.state.resizingKey,
+    });
+    const extraProps = callOrReturn(footerCellProps, { columns, column, columnIndex, footerIndex });
+    const { tagName, ...rest } = extraProps || {};
+    const Tag = tagName || 'div';
+    return (
+      <Tag
+        role="gridcell"
+        key={`footer-${footerIndex}-cell-${column.key}`}
+        onClick={column.sortable ? this._handleColumnSort : null}
+        {...rest}
+        className={cls}
+        style={this.columnManager.getColumnStyle(column.key)}
+        data-key={column.key}
+      >
+        {cell}
+      </Tag>
+    );
+  }
+
   renderMainTable() {
     const { width, headerHeight, rowHeight, fixed, estimatedRowHeight, ...rest } = this.props;
     const height = this._getTableHeight();
@@ -548,6 +619,7 @@ class BaseTable extends React.PureComponent {
         headerWidth={tableWidth + (fixed ? this._verticalScrollbarSize : 0)}
         bodyWidth={tableWidth}
         headerRenderer={this.renderHeader}
+        footerRenderer={this.renderFooter}
         rowRenderer={this.renderRow}
         onScroll={this._handleScroll}
         onRowsRendered={this._handleRowsRendered}
@@ -582,6 +654,7 @@ class BaseTable extends React.PureComponent {
         headerWidth={columnsWidth + offset}
         bodyWidth={columnsWidth + offset}
         headerRenderer={this.renderHeader}
+        footerRenderer={this.renderFooter}
         rowRenderer={this.renderRow}
         onScroll={this._handleVerticalScroll}
         onRowsRendered={noop}
@@ -616,6 +689,7 @@ class BaseTable extends React.PureComponent {
         headerWidth={columnsWidth + scrollbarWidth}
         bodyWidth={columnsWidth}
         headerRenderer={this.renderHeader}
+        footerRenderer={this.renderFooter}
         rowRenderer={this.renderRow}
         onScroll={this._handleVerticalScroll}
         onRowsRendered={noop}
@@ -652,7 +726,7 @@ class BaseTable extends React.PureComponent {
     return <div className={this._prefixClass('resizing-line')} style={style} />;
   }
 
-  renderFooter() {
+  renderStaticFooter() {
     const { footerHeight, footerRenderer } = this.props;
     if (footerHeight === 0) return null;
     return (
@@ -724,7 +798,7 @@ class BaseTable extends React.PureComponent {
     });
     return (
       <div ref={this._setContainerRef} className={cls} style={containerStyle}>
-        {this.renderFooter()}
+        {this.renderStaticFooter()}
         {this.renderMainTable()}
         {this.renderLeftTable()}
         {this.renderRightTable()}
