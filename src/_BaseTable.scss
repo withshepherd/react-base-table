@@ -170,6 +170,11 @@ $table-prefix: BaseTable !default;
     box-sizing: border-box;
   }
 
+  &__footer-row {
+    border-top: $border;
+    border-bottom: none;
+  }
+
   &__header-row,
   &__footer-row {
     background-color: $header-background-color;

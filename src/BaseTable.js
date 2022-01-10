@@ -1231,6 +1231,11 @@ BaseTable.propTypes = {
    */
   headerClassName: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   /**
+   * Class name for the table footer, could be a callback to return the class name
+   * The callback is of the shape of `({ columns, footerIndex }) => string`
+   */
+  footerClassName: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  /**
    * Class name for the table row, could be a callback to return the class name
    * The callback is of the shape of `({ columns, rowData, rowIndex }) => string`
    */
@@ -1241,10 +1246,20 @@ BaseTable.propTypes = {
    */
   headerProps: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
   /**
+   * Extra props applied to footer element
+   * The handler is of the shape of `({ columns, footerIndex }) object`
+   */
+  footerProps: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
+  /**
    * Extra props applied to header cell element
    * The handler is of the shape of `({ columns, column, columnIndex, headerIndex }) => object`
    */
   headerCellProps: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
+  /**
+   * Extra props applied to footer cell element
+   * The handler is of the shape of `({ columns, column, columnIndex, footerIndex }) => object`
+   */
+  footerCellProps: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
   /**
    * Extra props applied to row element
    * The handler is of the shape of `({ columns, rowData, rowIndex }) => object`

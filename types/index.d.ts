@@ -139,6 +139,20 @@ declare module '@withshepherd/react-base-table' {
         container: BaseTable<T>;
       }
     >;
+    /**
+     * Custom column footer renderer
+     * The renderer receives props `{ columns, column, columnIndex, footerIndex, container }`
+     */
+    footerRenderer?: CallOrReturn<
+      React.ReactNode,
+      {
+        columns: ColumnShape<T>[];
+        column: ColumnShape<T>;
+        columnIndex: number;
+        footerIndex: number;
+        container: BaseTable<T>;
+      }
+    >;
     [key: string]: any;
   }
 

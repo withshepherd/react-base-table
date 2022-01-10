@@ -236,6 +236,7 @@ GridTable.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   headerHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf(PropTypes.number)]).isRequired,
+  footerHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf(PropTypes.number)]).isRequired,
   headerWidth: PropTypes.number.isRequired,
   bodyWidth: PropTypes.number.isRequired,
   rowHeight: PropTypes.number.isRequired,
@@ -253,6 +254,7 @@ GridTable.propTypes = {
   onScroll: PropTypes.func,
   onRowsRendered: PropTypes.func,
   headerRenderer: PropTypes.func.isRequired,
+  footerRenderer: PropTypes.func.isRequired,
   rowRenderer: PropTypes.func.isRequired,
 };
 
