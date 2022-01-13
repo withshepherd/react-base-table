@@ -375,6 +375,8 @@ class BaseTable extends React.PureComponent {
   }
 
   renderRowCell({ isScrolling, columns, column, columnIndex, rowData, rowIndex, expandIcon }) {
+    const { itemData } = this.props;
+
     if (column[ColumnManager.PlaceholderKey]) {
       return (
         <div
@@ -391,7 +393,17 @@ class BaseTable extends React.PureComponent {
     const cellData = dataGetter
       ? dataGetter({ columns, column, columnIndex, rowData, rowIndex })
       : getValue(rowData, dataKey);
-    const cellProps = { isScrolling, cellData, columns, column, columnIndex, rowData, rowIndex, container: this };
+    const cellProps = {
+      isScrolling,
+      cellData,
+      columns,
+      column,
+      columnIndex,
+      rowData,
+      rowIndex,
+      container: this,
+      itemData,
+    };
     const cell = renderElement(cellRenderer || <TableCell className={this._prefixClass('row-cell-text')} />, cellProps);
 
     const cellCls = callOrReturn(className, { cellData, columns, column, columnIndex, rowData, rowIndex });
@@ -1400,6 +1412,7 @@ BaseTable.propTypes = {
     ExpandIcon: PropTypes.elementType,
     SortIndicator: PropTypes.elementType,
   }),
+  itemData: PropTypes.object,
 };
 
 export default BaseTable;

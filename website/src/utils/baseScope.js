@@ -19,11 +19,11 @@ import styled, { createGlobalStyle, css, keyframes } from 'styled-components'
 
 const generateColumns = (count = 10, prefix = 'column-', props) =>
   new Array(count).fill(0).map((column, columnIndex) => ({
-    ...props,
     key: `${prefix}${columnIndex}`,
     dataKey: `${prefix}${columnIndex}`,
     title: `Column ${columnIndex}`,
     width: 150,
+    ...props,
   }))
 
 const generateData = (columns, count = 200, prefix = 'row-') =>
