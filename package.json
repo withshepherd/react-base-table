@@ -50,7 +50,7 @@
     "memoize-one": "^5.0.0",
     "prop-types": "^15.7.0",
     "react-virtualized-auto-sizer": "^1.0.2",
-    "react-window": "^1.8.2"
+    "react-window": "^1.8.6"
   },
   "peerDependencies": {
     "react": "^16.0.0 || ^17.0.0",
