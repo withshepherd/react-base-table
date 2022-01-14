@@ -28,6 +28,7 @@ class GridTable extends React.PureComponent {
     this._getEstimatedTotalRowsHeight = memoize(getEstimatedTotalRowsHeight);
 
     this.renderRow = this.renderRow.bind(this);
+    this.renderBody = this.renderBody.bind(this);
   }
 
   resetAfterRowIndex(rowIndex = 0, shouldForceUpdate) {
@@ -78,6 +79,14 @@ class GridTable extends React.PureComponent {
     return rowRenderer({ ...args, columns, rowData });
   }
 
+  renderBody({ style, ...all }) {
+    const { data, rowHeight } = this.props;
+
+    return (
+      <>{data.map((d, rowIndex) => this.renderRow({ style: { ...style, top: rowHeight * rowIndex }, rowIndex }))}</>
+    );
+  }
+
   render() {
     const {
       containerStyle,
@@ -99,6 +108,7 @@ class GridTable extends React.PureComponent {
       // omit from rest
       style,
       onScrollbarPresenceChange,
+      virtualized,
       ...rest
     } = this.props;
     const headerHeight = this._getHeaderHeight();
@@ -132,6 +142,7 @@ class GridTable extends React.PureComponent {
             hoveredRowKey={frozenRowCount > 0 ? hoveredRowKey : null}
           />
         )}
+
         <Grid
           {...rest}
           className={`${classPrefix}__body`}
@@ -144,7 +155,7 @@ class GridTable extends React.PureComponent {
           height={Math.max(height - headerHeight - frozenRowsHeight, 0)}
           rowHeight={estimatedRowHeight ? getRowHeight : rowHeight}
           estimatedRowHeight={typeof estimatedRowHeight === 'function' ? undefined : estimatedRowHeight}
-          rowCount={data.length}
+          rowCount={virtualized ? data.length : 1}
           overscanRowCount={overscanRowCount}
           columnWidth={estimatedRowHeight ? this._getBodyWidth : bodyWidth}
           columnCount={1}
@@ -153,8 +164,9 @@ class GridTable extends React.PureComponent {
           hoveredRowKey={hoveredRowKey}
           onScroll={onScroll}
           onItemsRendered={this._handleItemsRendered}
-          children={this.renderRow}
+          children={virtualized ? this.renderRow : this.renderBody}
         />
+
         {headerHeight + frozenRowsHeight > 0 && (
           // put header after body and reverse the display order via css
           // to prevent header's shadow being covered by body
@@ -256,6 +268,7 @@ GridTable.propTypes = {
   headerRenderer: PropTypes.func.isRequired,
   footerRenderer: PropTypes.func.isRequired,
   rowRenderer: PropTypes.func.isRequired,
+  virtualized: PropTypes.bool.isRequired,
 };
 
 export default GridTable;

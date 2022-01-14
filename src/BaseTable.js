@@ -1142,6 +1142,8 @@ BaseTable.defaultProps = {
   onColumnSort: noop,
   onColumnResize: noop,
   onColumnResizeEnd: noop,
+
+  virtualized: true,
 };
 
 BaseTable.propTypes = {
@@ -1413,6 +1415,7 @@ BaseTable.propTypes = {
     SortIndicator: PropTypes.elementType,
   }),
   itemData: PropTypes.object,
+  virtualized: PropTypes.bool,
 };
 
 export default BaseTable;

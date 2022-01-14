@@ -8,12 +8,15 @@ const Container = styled(Page).attrs({ full: true })`
   height: 100vh;
 `
 
-const columns = utils.generateColumns(10, 'column-', { width: 500 })
+const columns = utils.generateColumns(10, 'column-', {
+  width: 500,
+  resizable: true,
+})
 const data = utils.generateData(columns, 200)
 const Table = utils.Table
 
 export default ({ location }) => (
   <Container title="Playground" location={location}>
-    <Table fixed columns={columns} data={data} />
+    <Table fixed columns={columns} data={data} virtualized={false} />
   </Container>
 )
