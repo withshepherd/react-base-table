@@ -28,7 +28,7 @@ class GridTable extends React.PureComponent {
     this._getEstimatedTotalRowsHeight = memoize(getEstimatedTotalRowsHeight);
 
     this.renderRow = this.renderRow.bind(this);
-    this.renderBody = this.renderBody.bind(this);
+    this.onDivScroll = this.onDivScroll.bind(this);
   }
 
   resetAfterRowIndex(rowIndex = 0, shouldForceUpdate) {
@@ -79,12 +79,35 @@ class GridTable extends React.PureComponent {
     return rowRenderer({ ...args, columns, rowData });
   }
 
-  renderBody({ style, ...all }) {
-    const { data, rowHeight } = this.props;
+  onDivScroll(event) {
+    const { clientHeight, clientWidth, scrollLeft, scrollTop, scrollHeight, scrollWidth } = event.currentTarget;
 
-    return (
-      <>{data.map((d, rowIndex) => this.renderRow({ style: { ...style, top: rowHeight * rowIndex }, rowIndex }))}</>
-    );
+    let calculatedScrollLeft = scrollLeft;
+
+    // Prevent Safari's elastic scrolling from causing visual shaking when scrolling past bounds.
+    calculatedScrollLeft = Math.max(0, Math.min(calculatedScrollLeft, scrollWidth - clientWidth));
+    const calculatedScrollTop = Math.max(0, Math.min(scrollTop, scrollHeight - clientHeight));
+
+    return this.props.onScroll({
+      isScrolling: true,
+      // horizontalScrollDirection: prevState.scrollLeft < scrollLeft ? 'forward' : 'backward',
+      scrollLeft: calculatedScrollLeft,
+      scrollTop: calculatedScrollTop,
+      // verticalScrollDirection: prevState.scrollTop < scrollTop ? 'forward' : 'backward',
+      scrollUpdateWasRequested: false,
+    });
+  }
+
+  componentDidMount() {
+    if (this.bodyRef && !this.props.virtualized) {
+      this.bodyRef.addEventListener('scroll', this.onDivScroll);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.bodyRef && !this.props.virtualized) {
+      this.bodyRef.removeEventListener('scroll', this.onDivScroll);
+    }
   }
 
   render() {
@@ -142,31 +165,52 @@ class GridTable extends React.PureComponent {
             hoveredRowKey={frozenRowCount > 0 ? hoveredRowKey : null}
           />
         )}
-
-        <Grid
-          {...rest}
-          className={`${classPrefix}__body`}
-          ref={this._setBodyRef}
-          innerRef={this._setInnerRef}
-          itemKey={this._itemKey}
-          data={data}
-          frozenData={frozenData}
-          width={width}
-          height={Math.max(height - headerHeight - frozenRowsHeight, 0)}
-          rowHeight={estimatedRowHeight ? getRowHeight : rowHeight}
-          estimatedRowHeight={typeof estimatedRowHeight === 'function' ? undefined : estimatedRowHeight}
-          rowCount={virtualized ? data.length : 1}
-          overscanRowCount={virtualized ? overscanRowCount : 0}
-          columnWidth={estimatedRowHeight ? this._getBodyWidth : bodyWidth}
-          columnCount={1}
-          overscanColumnCount={0}
-          useIsScrolling={useIsScrolling}
-          hoveredRowKey={hoveredRowKey}
-          onScroll={onScroll}
-          onItemsRendered={this._handleItemsRendered}
-          children={virtualized ? this.renderRow : this.renderBody}
-        />
-
+        {virtualized ? (
+          <Grid
+            {...rest}
+            className={`${classPrefix}__body`}
+            ref={this._setBodyRef}
+            innerRef={this._setInnerRef}
+            itemKey={this._itemKey}
+            data={data}
+            frozenData={frozenData}
+            width={width}
+            height={Math.max(height - headerHeight - frozenRowsHeight, 0)}
+            rowHeight={estimatedRowHeight ? getRowHeight : rowHeight}
+            estimatedRowHeight={typeof estimatedRowHeight === 'function' ? undefined : estimatedRowHeight}
+            rowCount={data.length}
+            overscanRowCount={overscanRowCount}
+            columnWidth={estimatedRowHeight ? this._getBodyWidth : bodyWidth}
+            columnCount={1}
+            overscanColumnCount={0}
+            useIsScrolling={useIsScrolling}
+            hoveredRowKey={hoveredRowKey}
+            onScroll={onScroll}
+            onItemsRendered={this._handleItemsRendered}
+            children={this.renderRow}
+          />
+        ) : (
+          <div
+            style={{
+              width: width,
+              height: Math.max(height - headerHeight - frozenRowsHeight, 0),
+              overflow: 'scroll',
+            }}
+            className={`${classPrefix}__body`}
+            ref={this._setBodyRef}
+          >
+            {data.map((d, rowIndex) =>
+              this.renderRow({
+                columnIndex: 0,
+                rowIndex,
+                style: {
+                  height: rowHeight,
+                  width: headerWidth,
+                },
+              })
+            )}
+          </div>
+        )}
         {headerHeight + frozenRowsHeight > 0 && (
           // put header after body and reverse the display order via css
           // to prevent header's shadow being covered by body
