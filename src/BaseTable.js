@@ -605,7 +605,7 @@ class BaseTable extends React.PureComponent {
   }
 
   renderMainTable() {
-    const { width, headerHeight, rowHeight, fixed, estimatedRowHeight, ...rest } = this.props;
+    const { width, headerHeight, rowHeight, fixed, estimatedRowHeight, itemData, ...rest } = this.props;
     const height = this._getTableHeight();
 
     let tableWidth = width - this._verticalScrollbarSize;
@@ -635,6 +635,7 @@ class BaseTable extends React.PureComponent {
         rowRenderer={this.renderRow}
         onScroll={this._handleScroll}
         onRowsRendered={this._handleRowsRendered}
+        itemData={itemData}
       />
     );
   }
@@ -642,7 +643,7 @@ class BaseTable extends React.PureComponent {
   renderLeftTable() {
     if (!this.columnManager.hasLeftFrozenColumns()) return null;
 
-    const { width, headerHeight, rowHeight, estimatedRowHeight, ...rest } = this.props;
+    const { width, headerHeight, rowHeight, estimatedRowHeight, itemData, ...rest } = this.props;
 
     const containerHeight = this._getFrozenContainerHeight();
     const offset = this._verticalScrollbarSize || 20;
@@ -670,6 +671,7 @@ class BaseTable extends React.PureComponent {
         rowRenderer={this.renderRow}
         onScroll={this._handleVerticalScroll}
         onRowsRendered={noop}
+        itemData={itemData}
       />
     );
   }
@@ -677,7 +679,7 @@ class BaseTable extends React.PureComponent {
   renderRightTable() {
     if (!this.columnManager.hasRightFrozenColumns()) return null;
 
-    const { width, headerHeight, rowHeight, estimatedRowHeight, ...rest } = this.props;
+    const { width, headerHeight, rowHeight, estimatedRowHeight, itemData, ...rest } = this.props;
 
     const containerHeight = this._getFrozenContainerHeight();
     const columnsWidth = this.columnManager.getRightFrozenColumnsWidth();
@@ -705,6 +707,7 @@ class BaseTable extends React.PureComponent {
         rowRenderer={this.renderRow}
         onScroll={this._handleVerticalScroll}
         onRowsRendered={noop}
+        itemData={itemData}
       />
     );
   }

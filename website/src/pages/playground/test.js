@@ -1,5 +1,5 @@
 import Page from 'components/Page'
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import utils from 'utils/baseScope'
 
@@ -15,8 +15,23 @@ const columns = utils.generateColumns(10, 'column-', {
 const data = utils.generateData(columns, 200)
 const Table = utils.Table
 
-export default ({ location }) => (
-  <Container title="Playground" location={location}>
-    <Table fixed columns={columns} data={data} virtualized={false} />
-  </Container>
-)
+const ITEM_DATA = { a: 1 }
+
+const Test = ({ location }) => {
+  const [itemData, setItemData] = useState(ITEM_DATA)
+
+  return (
+    <Container title="Playground" location={location}>
+      <button onClick={() => setItemData({ a: itemData.a + 1 })}>State</button>
+      <Table
+        fixed
+        columns={columns}
+        data={data}
+        virtualized={false}
+        itemData={ITEM_DATA}
+      />
+    </Container>
+  )
+}
+
+export default Test

@@ -123,6 +123,7 @@ declare module '@withshepherd/react-base-table' {
         rowIndex: number;
         container: BaseTable<T>;
         isScrolling?: boolean;
+        itemData: Record<string, any>;
       }
     >;
     /**
@@ -137,6 +138,7 @@ declare module '@withshepherd/react-base-table' {
         columnIndex: number;
         headerIndex: number;
         container: BaseTable<T>;
+        itemData: Record<string, any>;
       }
     >;
     /**
@@ -151,6 +153,7 @@ declare module '@withshepherd/react-base-table' {
         columnIndex: number;
         footerIndex: number;
         container: BaseTable<T>;
+        itemData: Record<string, any>;
       }
     >;
     [key: string]: any;
@@ -502,6 +505,9 @@ declare module '@withshepherd/react-base-table' {
      * A object for the custom components, like `ExpandIcon` and `SortIndicator`
      */
     components?: TableComponents;
+
+    itemData: Record<string, any>;
+
     [key: string]: any;
   }
 
